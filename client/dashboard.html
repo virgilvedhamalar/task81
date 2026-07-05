@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBAC - User Console</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between fade-in">
+
+  <!-- Dynamic Navigation Bar -->
+  <nav id="navbar-container"></nav>
+
+  <!-- User Console Layout -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-5 border-b border-slate-200">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <span>📊</span> User Security Console
+        </h1>
+        <p class="text-sm text-slate-400 mt-1">
+          Standard Authorization Level. Welcome to your secure workspace.
+        </p>
+      </div>
+      <div class="mt-4 md:mt-0 flex items-center space-x-3">
+        <span class="badge-user px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+          Standard User Role
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      
+      <!-- Left 2 Columns: Product Catalog View -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+            <h3 class="text-lg font-bold text-slate-900">Your Catalog Authorization</h3>
+            <span class="text-xs text-slate-400 font-mono bg-slate-50 border border-slate-200/80 px-2 py-1 rounded">Policy: SELECT_ALL_CATALOG</span>
+          </div>
+
+          <!-- Product Catalog Container -->
+          <div id="dashboard-catalog" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Loaded by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Right 1 Column: User Profile Overview & RBAC Sandbox Rules -->
+      <div class="space-y-6">
+        
+        <!-- Welcome Account Card -->
+        <div class="sleek-card p-6 bg-white">
+          <h3 class="text-base font-bold text-slate-900 mb-4 border-b border-slate-100 pb-2">Secured Account Context</h3>
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between border-b border-slate-100 pb-2">
+              <span class="text-slate-400">Name</span>
+              <span id="user-name-display" class="font-bold text-slate-800">Loading...</span>
+            </div>
+            <div class="flex justify-between border-b border-slate-100 pb-2">
+              <span class="text-slate-400">Email</span>
+              <span id="user-email-display" class="font-medium text-slate-800">Loading...</span>
+            </div>
+            <div class="flex justify-between pb-1">
+              <span class="text-slate-400">Status</span>
+              <span class="text-emerald-600 font-bold flex items-center gap-1">
+                <span class="h-2 w-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span> Active JWT
+              </span>
+            </div>
+            <div class="pt-3">
+              <a href="/profile.html" class="block text-center w-full py-2 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 rounded-lg text-xs transition">
+                Modify Profile Credentials →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- RBAC Audit Policy Tester (Educational tool demonstrating 403 Forbidden checks) -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div class="flex items-center gap-2 text-rose-700 font-bold text-xs uppercase tracking-wider mb-3">
+            <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+            <span>RBAC Constraint Inspector</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4 leading-relaxed">
+            Test and audit backend security constraints. Because you are authenticated under the <strong>User</strong> role, attempting any action below will be actively blocked by the server's <code>authorizeRole('Admin')</code> middleware and return a <code>403 Forbidden</code> response.
+          </p>
+          
+          <div class="space-y-3">
+            <!-- Blocked Action 1 -->
+            <button id="test-delete-btn" class="w-full text-left px-3.5 py-2.5 border border-slate-200 hover:border-red-300 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-700 flex items-center justify-between transition bg-slate-50 hover:bg-red-50/50 cursor-pointer">
+              <span>Delete User Account</span>
+              <span class="font-mono bg-red-50 text-red-700 text-[10px] px-1.5 py-0.5 rounded border border-red-100 font-bold">403 Blocked</span>
+            </button>
+
+            <!-- Blocked Action 2 -->
+            <button id="test-create-prod-btn" class="w-full text-left px-3.5 py-2.5 border border-slate-200 hover:border-red-300 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-700 flex items-center justify-between transition bg-slate-50 hover:bg-red-50/50 cursor-pointer">
+              <span>Add New Catalog Product</span>
+              <span class="font-mono bg-red-50 text-red-700 text-[10px] px-1.5 py-0.5 rounded border border-red-100 font-bold">403 Blocked</span>
+            </button>
+
+            <!-- Blocked Action 3 -->
+            <button id="test-admin-panel-btn" class="w-full text-left px-3.5 py-2.5 border border-slate-200 hover:border-red-300 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-700 flex items-center justify-between transition bg-slate-50 hover:bg-red-50/50 cursor-pointer">
+              <span>Access Administrative Panel</span>
+              <span class="font-mono bg-red-50 text-red-700 text-[10px] px-1.5 py-0.5 rounded border border-red-100 font-bold">403 Blocked</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-400 font-mono">
+      © 2026 RBAC System. Security Architecture Certified.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { Auth, apiRequest, guardRoute, renderNavBar, showToast } from '/js/api.js';
+
+    // Verify authentication and role is 'User'
+    const isAuthorized = guardRoute(['User', 'Admin']);
+
+    if (isAuthorized) {
+      document.addEventListener('DOMContentLoaded', () => {
+        renderNavBar();
+        loadProfileData();
+        loadProducts();
+        setupAuditListeners();
+      });
+    }
+
+    // Fill user displays
+    function loadProfileData() {
+      const user = Auth.getUser();
+      if (user) {
+        document.getElementById('user-name-display').innerText = user.name;
+        document.getElementById('user-email-display').innerText = user.email;
+      }
+    }
+
+    // Load products list (Read-Only access)
+    async function loadProducts() {
+      const catalog = document.getElementById('dashboard-catalog');
+      try {
+        const data = await apiRequest('/user/products');
+        if (data.success && data.products.length > 0) {
+          catalog.innerHTML = data.products.map(p => `
+            <div class="sleek-card p-4 bg-white flex flex-col justify-between">
+              <div>
+                <span class="text-[9px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded border border-indigo-100/50">
+                  ${p.category || 'General'}
+                </span>
+                <h4 class="font-bold text-slate-900 mt-3 text-sm">${p.name}</h4>
+                <p class="text-xs text-slate-400 mt-1 line-clamp-2">${p.description || 'No description provided.'}</p>
+              </div>
+              <div class="flex items-center justify-between mt-3 pt-3 border-t border-slate-100 text-xs">
+                <span class="text-slate-400 font-medium">Price</span>
+                <span class="font-bold text-indigo-600 font-mono">$${p.price.toFixed(2)}</span>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          catalog.innerHTML = '<div class="col-span-2 text-center text-slate-400 py-8 text-xs">No products in directory.</div>';
+        }
+      } catch (err) {
+        showToast('Failed to retrieve catalog: ' + err.message, 'error');
+      }
+    }
+
+    // Attach trigger tests demonstrating server-enforced role restrictions
+    function setupAuditListeners() {
+      // Test 1: Try deleting a user
+      document.getElementById('test-delete-btn').addEventListener('click', async () => {
+        try {
+          await apiRequest('/admin/users/fake-id-123', { method: 'DELETE' });
+          showToast('Bypassed Security? This should not happen.', 'success');
+        } catch (err) {
+          showToast(`Denied! Server returned HTTP 403: ${err.message}`, 'error');
+        }
+      });
+
+      // Test 2: Try creating a product
+      document.getElementById('test-create-prod-btn').addEventListener('click', async () => {
+        try {
+          await apiRequest('/admin/products', {
+            method: 'POST',
+            body: JSON.stringify({ name: 'Hack Token', price: 999 })
+          });
+          showToast('Bypassed Security? This should not happen.', 'success');
+        } catch (err) {
+          showToast(`Denied! Server returned HTTP 403: ${err.message}`, 'error');
+        }
+      });
+
+      // Test 3: Try accessing admin dashboard statistics
+      document.getElementById('test-admin-panel-btn').addEventListener('click', async () => {
+        try {
+          await apiRequest('/admin/dashboard');
+          showToast('Bypassed Security? This should not happen.', 'success');
+        } catch (err) {
+          showToast(`Denied! Server returned HTTP 403: ${err.message}`, 'error');
+        }
+      });
+    }
+  </script>
+</body>
+</html>

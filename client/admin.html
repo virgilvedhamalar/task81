@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBAC - Secure Administration Console</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between fade-in">
+
+  <!-- Dynamic Navigation Bar -->
+  <nav id="navbar-container"></nav>
+
+  <!-- Administrative Control Console -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 pb-5 border-b border-slate-200">
+      <div>
+        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+          <span>🔧</span> Administration Console
+        </h1>
+        <p class="text-sm text-slate-400 mt-1">
+          Full System Operations and Access Auditing.
+        </p>
+      </div>
+      <div class="mt-4 md:mt-0">
+        <span class="badge-admin px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider">
+          Security Level: Root Administrator
+        </span>
+      </div>
+    </div>
+
+    <!-- Telemetry Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      
+      <!-- Card 1: Total Accounts -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+          <span>Active Accounts</span>
+          <span>👥</span>
+        </div>
+        <div class="text-3xl font-extrabold text-slate-900" id="stat-total-users">0</div>
+        <div class="text-[11px] text-slate-400 mt-2 flex justify-between border-t border-slate-100 pt-2">
+          <span>Admins: <strong class="text-red-600" id="stat-admin-count">0</strong></span>
+          <span>Users: <strong class="text-emerald-600" id="stat-user-count">0</strong></span>
+        </div>
+      </div>
+
+      <!-- Card 2: Catalog Size -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+          <span>Catalog Products</span>
+          <span>📦</span>
+        </div>
+        <div class="text-3xl font-extrabold text-slate-900" id="stat-total-products">0</div>
+        <div class="text-[11px] text-emerald-600 font-bold mt-2 border-t border-slate-100 pt-2">
+          ✓ Read/Write Privileges Enabled
+        </div>
+      </div>
+
+      <!-- Card 3: Storage Driver -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+          <span>Database Driver</span>
+          <span>💾</span>
+        </div>
+        <div class="text-lg font-bold text-slate-900 truncate" id="stat-db-mode">Loading Driver...</div>
+        <div class="text-[10px] text-slate-400 font-mono mt-2 border-t border-slate-100 pt-2">Auto-fallback simulation wrapper</div>
+      </div>
+
+      <!-- Card 4: System Time -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+        <div class="flex items-center justify-between text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">
+          <span>Node Environment</span>
+          <span>⚙️</span>
+        </div>
+        <div class="text-lg font-bold text-slate-900" id="stat-node-env">Checking Node...</div>
+        <div class="text-[10px] text-slate-400 font-mono mt-2 border-t border-slate-100 pt-2" id="stat-system-time">UTC Clock synced</div>
+      </div>
+
+    </div>
+
+    <!-- Management Panes Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Section: Users Auditing List (7 Columns) -->
+      <div class="lg:col-span-7 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+            <h3 class="text-lg font-bold text-slate-900">User Access Management</h3>
+            <span class="text-xs text-slate-400 font-mono bg-slate-50 px-2 py-1 border border-slate-200/60 rounded">Policy: FULL_CONTROL</span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+              <thead>
+                <tr class="text-slate-400 font-bold uppercase text-xs tracking-wider border-b border-slate-100">
+                  <th class="py-3 px-3">User Identity</th>
+                  <th class="py-3 px-3">Assigned Role</th>
+                  <th class="py-3 px-3 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body" class="divide-y divide-slate-50">
+                <!-- Loaded by Javascript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Section: Products CRUD Panel (5 Columns) -->
+      <div class="lg:col-span-5 space-y-6">
+        
+        <!-- Add/Edit Product Form Card -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+            <h3 class="text-lg font-bold text-slate-900" id="product-form-title">Add New Product</h3>
+            <button id="cancel-edit-btn" class="text-xs text-rose-600 hover:underline hidden cursor-pointer font-bold">
+              Cancel Edit
+            </button>
+          </div>
+
+          <form id="product-form" class="space-y-4">
+            <input type="hidden" id="product-id-field">
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Product Title</label>
+              <input type="text" id="prod-name" required placeholder="e.g. Cryptographic Token"
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 text-sm">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Price ($)</label>
+                <input type="number" id="prod-price" required step="0.01" min="0" placeholder="49.99"
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 text-sm">
+              </div>
+              <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Category</label>
+                <input type="text" id="prod-category" placeholder="Security Hardware"
+                  class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 text-sm">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Description</label>
+              <textarea id="prod-desc" rows="3" placeholder="Write description details here..."
+                class="w-full px-3 py-2 border border-slate-200 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 text-sm"></textarea>
+            </div>
+
+            <button type="submit" id="product-submit-btn" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg text-xs shadow-lg shadow-indigo-100 transition cursor-pointer">
+              Save Product to Database
+            </button>
+          </form>
+        </div>
+
+        <!-- Current Products List -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3 mb-4">Catalog Inventory</h3>
+          <div id="admin-product-list" class="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+            <!-- Loaded by Javascript -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-400 font-mono">
+      © 2026 RBAC System. Security Architecture Certified.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { Auth, apiRequest, guardRoute, renderNavBar, showToast } from '/js/api.js';
+
+    // Strictly guard route - requires 'Admin' role
+    const isAuthorized = guardRoute(['Admin']);
+
+    if (isAuthorized) {
+      document.addEventListener('DOMContentLoaded', () => {
+        renderNavBar();
+        loadTelemetry();
+        loadUsers();
+        loadProducts();
+
+        // Bind form submissions
+        document.getElementById('product-form').addEventListener('submit', handleProductSubmit);
+        document.getElementById('cancel-edit-btn').addEventListener('click', clearProductForm);
+      });
+    }
+
+    // 1. Load System Telemetry
+    async function loadTelemetry() {
+      try {
+        const data = await apiRequest('/admin/dashboard');
+        if (data.success) {
+          const stats = data.stats;
+          document.getElementById('stat-total-users').innerText = stats.totalUsers;
+          document.getElementById('stat-admin-count').innerText = stats.adminCount;
+          document.getElementById('stat-user-count').innerText = stats.normalUserCount;
+          document.getElementById('stat-total-products').innerText = stats.totalProducts;
+          document.getElementById('stat-db-mode').innerText = stats.dbStatus;
+          document.getElementById('stat-node-env').innerText = stats.environment.toUpperCase();
+          document.getElementById('stat-system-time').innerText = `Node ${stats.nodeVersion}`;
+        }
+      } catch (err) {
+        showToast('Telemetry retrieval error: ' + err.message, 'error');
+      }
+    }
+
+    // 2. Load Users
+    async function loadUsers() {
+      const tableBody = document.getElementById('users-table-body');
+      try {
+        const data = await apiRequest('/admin/users');
+        if (data.success) {
+          const currentAdmin = Auth.getUser();
+          
+          tableBody.innerHTML = data.users.map(u => {
+            const isSelf = u.id === currentAdmin.id;
+            const badgeClass = u.role === 'Admin' ? 'badge-admin' : 'badge-user';
+            const initials = (u.name || 'US').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const avatarBg = u.role === 'Admin' ? 'bg-red-50 text-red-700 border border-red-100/50' : 'bg-emerald-50 text-emerald-700 border border-emerald-100/50';
+            
+            return `
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-4 px-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full ${avatarBg} flex items-center justify-center text-xs font-bold shrink-0">
+                      ${initials}
+                    </div>
+                    <div>
+                      <div class="font-bold text-slate-900 text-sm leading-tight">${u.name}</div>
+                      <div class="text-xs text-slate-400 font-mono mt-0.5">${u.email}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="py-4 px-3">
+                  <span class="${badgeClass} px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
+                    ${u.role}
+                  </span>
+                </td>
+                <td class="py-4 px-3 text-right">
+                  ${isSelf ? `
+                    <span class="text-xs text-slate-400 italic font-medium pr-2">Active Self</span>
+                  ` : `
+                    <button onclick="confirmDeleteUser('${u.id}', '${u.name}')" class="text-xs font-bold text-rose-600 hover:text-rose-800 transition px-2 cursor-pointer">
+                      Delete
+                    </button>
+                  `}
+                </td>
+              </tr>
+            `;
+          }).join('');
+        }
+      } catch (err) {
+        showToast('Users mapping failed: ' + err.message, 'error');
+      }
+    }
+
+    // Expose delete functions to global window object since we output them dynamically in innerHTML string templates
+    window.confirmDeleteUser = async (id, name) => {
+      const confirmText = `⚠️ WARNING: Are you sure you want to permanently delete user "${name}"?\nThis is cryptographically irreversible.`;
+      if (confirm(confirmText)) {
+        try {
+          const res = await apiRequest(`/admin/users/${id}`, { method: 'DELETE' });
+          if (res.success) {
+            showToast(res.message, 'success');
+            loadUsers();
+            loadTelemetry();
+          }
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+    };
+
+    // 3. Load Products inside CRUD list
+    async function loadProducts() {
+      const list = document.getElementById('admin-product-list');
+      try {
+        const data = await apiRequest('/user/products'); // Standard retrieval
+        if (data.success) {
+          if (data.products.length === 0) {
+            list.innerHTML = '<div class="text-center text-xs text-slate-400 py-6">No products found.</div>';
+            return;
+          }
+
+          list.innerHTML = data.products.map(p => `
+            <div class="flex items-start justify-between border border-slate-150 rounded-xl p-3.5 hover:border-indigo-150 transition-colors bg-slate-50 hover:bg-white sleek-card">
+              <div class="max-w-[70%]">
+                <h4 class="font-bold text-slate-900 text-sm truncate tracking-tight">${p.name}</h4>
+                <div class="flex items-center space-x-2 mt-1.5">
+                  <span class="text-[9px] font-mono font-bold uppercase bg-indigo-50 text-indigo-600 border border-indigo-100/50 px-1.5 py-0.5 rounded">
+                    ${p.category || 'General'}
+                  </span>
+                  <span class="text-xs text-indigo-600 font-bold font-mono">$${p.price.toFixed(2)}</span>
+                </div>
+              </div>
+              <div class="flex space-x-3 text-xs pt-1">
+                <button onclick="triggerEditProduct('${p.id || p._id}', '${p.name}', ${p.price}, '${p.category || ''}', '${(p.description || '').replace(/'/g, "\\'")}')" class="text-indigo-600 hover:text-indigo-800 font-bold hover:underline cursor-pointer">
+                  Edit
+                </button>
+                <button onclick="deleteProductItem('${p.id || p._id}')" class="text-rose-600 hover:text-rose-800 font-bold hover:underline cursor-pointer">
+                  Delete
+                </button>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch (err) {
+        showToast('Products catalog retrieval error: ' + err.message, 'error');
+      }
+    }
+
+    // Trigger editing filling
+    window.triggerEditProduct = (id, name, price, category, desc) => {
+      document.getElementById('product-form-title').innerText = 'Edit Product';
+      document.getElementById('cancel-edit-btn').classList.remove('hidden');
+      document.getElementById('product-submit-btn').innerText = 'Update Product in Catalog';
+
+      document.getElementById('product-id-field').value = id;
+      document.getElementById('prod-name').value = name;
+      document.getElementById('prod-price').value = price;
+      document.getElementById('prod-category').value = category;
+      document.getElementById('prod-desc').value = desc;
+    };
+
+    function clearProductForm() {
+      document.getElementById('product-form-title').innerText = 'Add New Product';
+      document.getElementById('cancel-edit-btn').classList.add('hidden');
+      document.getElementById('product-submit-btn').innerText = 'Save Product to Database';
+
+      document.getElementById('product-id-field').value = '';
+      document.getElementById('product-form').reset();
+    }
+
+    // Delete Product
+    window.deleteProductItem = async (id) => {
+      if (confirm('Permanently delete this product from catalog?')) {
+        try {
+          const res = await apiRequest(`/admin/products/${id}`, { method: 'DELETE' });
+          if (res.success) {
+            showToast(res.message, 'success');
+            loadProducts();
+            loadTelemetry();
+          }
+        } catch (err) {
+          showToast(err.message, 'error');
+        }
+      }
+    };
+
+    // Product Submit Handler (Create or Update)
+    async function handleProductSubmit(e) {
+      e.preventDefault();
+
+      const id = document.getElementById('product-id-field').value;
+      const name = document.getElementById('prod-name').value;
+      const price = document.getElementById('prod-price').value;
+      const category = document.getElementById('prod-category').value;
+      const description = document.getElementById('prod-desc').value;
+
+      const isEditing = !!id;
+      const url = isEditing ? `/admin/products/${id}` : '/admin/products';
+      const method = isEditing ? 'PUT' : 'POST';
+
+      try {
+        const res = await apiRequest(url, {
+          method,
+          body: JSON.stringify({ name, price, category, description })
+        });
+
+        if (res.success) {
+          showToast(res.message, 'success');
+          clearProductForm();
+          loadProducts();
+          loadTelemetry();
+        }
+      } catch (err) {
+        showToast(err.message, 'error');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "Role-Based Access Control System",
+  "description": "A secure, beginner-friendly Role-Based Access Control (RBAC) authentication system built with Express, Node.js, Mongoose, and JWT.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

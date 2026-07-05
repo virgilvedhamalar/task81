@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBAC - Register Secure Account</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col justify-between fade-in">
+
+  <!-- Dynamic Navigation Bar -->
+  <nav id="navbar-container"></nav>
+
+  <!-- Register Form Card -->
+  <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
+      <div class="text-center mb-6">
+        <span class="text-3xl">🛡️</span>
+        <h2 class="text-2xl font-bold text-slate-900 tracking-tight mt-3">Create Secure Account</h2>
+        <p class="text-xs text-slate-400 mt-1">
+          Access control protocols will be assigned immediately upon registration.
+        </p>
+      </div>
+
+      <form id="register-form" class="space-y-4">
+        <!-- Full Name -->
+        <div>
+          <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Full Name</label>
+          <input type="text" id="name" name="name" required placeholder="John Doe" 
+            class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Email Address</label>
+          <input type="email" id="email" name="email" required placeholder="johndoe@example.com" 
+            class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Security Password</label>
+          <input type="password" id="password" name="password" required minlength="6" placeholder="••••••••" 
+            class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">
+          <p class="text-[10px] text-slate-400 mt-1">Minimum 6 characters required. Passwords will be cryptographically hashed.</p>
+        </div>
+
+        <!-- Role Selector -->
+        <div>
+          <label for="role" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Assigned Security Role</label>
+          <div class="relative">
+            <select id="role" name="role" required 
+              class="w-full px-4 py-2.5 border border-slate-200 rounded-xl text-slate-800 bg-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition appearance-none">
+              <option value="User">User (Standard Profile View)</option>
+              <option value="Admin">Admin (Full System Controls)</option>
+            </select>
+            <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-slate-500">
+              ▼
+            </div>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-1">For development testing, you can explicitly register with any authorization level.</p>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="submit-btn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-xl shadow-sm transition hover:shadow cursor-pointer flex items-center justify-center">
+          <span>Complete Secure Registration</span>
+        </button>
+      </form>
+
+      <!-- Toggle Mode Link -->
+      <div class="text-center mt-6 pt-6 border-t border-slate-100">
+        <p class="text-sm text-slate-500">
+          Already have an active credential? 
+          <a href="/login.html" class="text-indigo-600 hover:text-indigo-700 font-semibold transition">Sign In here</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400 font-mono">
+    © 2026 RBAC System. Security Architecture Certified.
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { Auth, apiRequest, renderNavBar, showToast } from '/js/api.js';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavBar();
+
+      // Redirect if already logged in
+      if (Auth.isAuthenticated()) {
+        const user = Auth.getUser();
+        window.location.href = user.role === 'Admin' ? '/admin.html' : '/dashboard.html';
+      }
+
+      const registerForm = document.getElementById('register-form');
+      const submitBtn = document.getElementById('submit-btn');
+
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // UI Feedback
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Hashing & Registering...';
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const role = document.getElementById('role').value;
+
+        try {
+          const response = await apiRequest('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ name, email, password, role })
+          });
+
+          showToast('Registration Successful! Redirecting to sign in...', 'success');
+          
+          setTimeout(() => {
+            window.location.href = '/login.html';
+          }, 1500);
+
+        } catch (err) {
+          showToast(err.message, 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Complete Secure Registration';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

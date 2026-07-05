@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RBAC Security Gate - Welcome</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col fade-in">
+
+  <!-- Dynamic Navigation Bar -->
+  <nav id="navbar-container"></nav>
+
+  <!-- Hero Section -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <div class="bg-white rounded-2xl border border-slate-200 p-8 md:p-12 shadow-sm mb-8 relative overflow-hidden">
+      <!-- Ambient background decoration -->
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-50 rounded-full blur-3xl opacity-60 pointer-events-none"></div>
+      <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none hidden lg:block">
+        <span class="text-9xl font-mono">🛡️</span>
+      </div>
+      
+      <div class="max-w-3xl relative z-10">
+        <span class="bg-indigo-50 text-indigo-700 text-xs font-bold tracking-wider uppercase px-3 py-1.5 rounded-full border border-indigo-100/60">
+          SECURE RBAC PROTOCOL DEMO
+        </span>
+        <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight mt-5 sm:text-5xl">
+          Role-Based Access Control System
+        </h1>
+        <p class="text-base md:text-lg text-slate-500 mt-4 leading-relaxed font-sans">
+          Welcome to the beginner-friendly, production-ready RBAC authentication playground. Built with a Node/Express backend, custom JWT authorization guards, password hashing, and real-time MongoDB/Mongoose data bridging.
+        </p>
+        
+        <div class="mt-8 flex flex-wrap gap-4" id="hero-actions">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Seed Credentials Information Panel -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+      <!-- Admin Credentials Card -->
+      <div class="sleek-card p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-red-50 border border-red-100 flex items-center justify-center text-red-600 font-bold">🔴</div>
+          <h3 class="text-lg font-bold text-slate-900">Administrator Console Access</h3>
+        </div>
+        <p class="text-sm text-slate-500 mb-4">
+          Allows full administrative authorization including user auditing, profile management, and total product catalog CRUD controls.
+        </p>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 font-mono text-xs text-slate-700 space-y-1.5">
+          <div class="flex justify-between"><span class="font-bold text-slate-500">Email:</span> <span class="text-slate-900 font-semibold">admin@example.com</span></div>
+          <div class="flex justify-between"><span class="font-bold text-slate-500">Password:</span> <span class="text-slate-900 font-semibold">adminpassword</span></div>
+          <div class="flex justify-between border-t border-slate-200/60 pt-1.5 mt-1.5 text-[10px] text-red-600"><span class="font-bold">Permissions:</span> <span>Read/Write catalog, Delete accounts</span></div>
+        </div>
+      </div>
+
+      <!-- User Credentials Card -->
+      <div class="sleek-card p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 font-bold">🟢</div>
+          <h3 class="text-lg font-bold text-slate-900">Standard User Profile</h3>
+        </div>
+        <p class="text-sm text-slate-500 mb-4">
+          Allows standard user accounts to view registered catalogs, create custom profiles, and safely update credentials.
+        </p>
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-4 font-mono text-xs text-slate-700 space-y-1.5">
+          <div class="flex justify-between"><span class="font-bold text-slate-500">Email:</span> <span class="text-slate-900 font-semibold">user@example.com</span></div>
+          <div class="flex justify-between"><span class="font-bold text-slate-500">Password:</span> <span class="text-slate-900 font-semibold">userpassword</span></div>
+          <div class="flex justify-between border-t border-slate-200/60 pt-1.5 mt-1.5 text-[10px] text-emerald-600"><span class="font-bold">Permissions:</span> <span>Read-only catalog, update own profile</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Catalog Section (Interactive) -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
+      <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-100 pb-5 mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Security Solutions Catalog</h2>
+          <p class="text-sm text-slate-400 mt-1">
+            Dynamic catalog items retrieved directly from secure endpoints.
+          </p>
+        </div>
+        <span class="text-xs font-mono bg-slate-50 text-slate-600 px-3.5 py-1.5 rounded-lg border border-slate-200 mt-3 md:mt-0" id="db-status-badge">
+          Querying Status: Checking...
+        </span>
+      </div>
+
+      <!-- Auth Prompt for Products -->
+      <div id="catalog-unauthenticated" class="py-12 text-center">
+        <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-xl mb-4">🔒</div>
+        <h4 class="text-lg font-bold text-slate-900">Access Restricted</h4>
+        <p class="text-sm text-slate-400 mt-1 max-w-sm mx-auto">
+          You must be registered and logged in to view the products catalog. Please authenticate using the buttons above.
+        </p>
+        <div class="mt-5">
+          <a href="/login.html" class="inline-flex items-center px-4 py-2 border border-slate-200 hover:border-slate-300 text-sm font-bold rounded-lg text-slate-600 bg-white hover:bg-slate-50 transition shadow-sm">
+            Sign In Now
+          </a>
+        </div>
+      </div>
+
+      <!-- Catalog List -->
+      <div id="catalog-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 hidden">
+        <!-- Loaded by Javascript -->
+      </div>
+    </div>
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-400 font-mono">
+      © 2026 RBAC System. Security Architecture Certified.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script type="module">
+    import { Auth, apiRequest, renderNavBar, showToast } from '/js/api.js';
+
+    // Check backend telemetry status
+    async function checkSystemStatus() {
+      const badge = document.getElementById('db-status-badge');
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.success) {
+          badge.innerHTML = `Mode: <span class="font-bold text-slate-800">${data.databaseMode}</span>`;
+        }
+      } catch (err) {
+        badge.innerHTML = 'Mode: <span class="text-rose-600 font-bold">Offline</span>';
+      }
+    }
+
+    // Load and render Products catalog
+    async function loadCatalog() {
+      if (!Auth.isAuthenticated()) return;
+
+      const unauthPanel = document.getElementById('catalog-unauthenticated');
+      const catalogContainer = document.getElementById('catalog-container');
+
+      try {
+        const data = await apiRequest('/user/products');
+        
+        if (data.success && data.products.length > 0) {
+          unauthPanel.classList.add('hidden');
+          catalogContainer.classList.remove('hidden');
+
+          catalogContainer.innerHTML = data.products.map(prod => `
+            <div class="sleek-card p-5 bg-white flex flex-col justify-between h-full">
+              <div>
+                <span class="bg-indigo-50 text-indigo-600 text-[10px] font-bold tracking-wider uppercase px-2.5 py-1 rounded border border-indigo-100/50">
+                  ${prod.category || 'General'}
+                </span>
+                <h4 class="text-base font-bold text-slate-900 mt-4 tracking-tight">${prod.name}</h4>
+                <p class="text-xs text-slate-500 mt-2 leading-relaxed line-clamp-3">${prod.description || 'No description supplied.'}</p>
+              </div>
+              <div class="flex items-center justify-between border-t border-slate-100 pt-4 mt-5">
+                <span class="text-xs text-slate-400 font-medium">Unit Price</span>
+                <span class="text-lg font-bold text-indigo-600 font-mono">$${prod.price.toFixed(2)}</span>
+              </div>
+            </div>
+          `).join('');
+        } else {
+          unauthPanel.innerHTML = `
+            <div class="py-8 text-slate-400">
+              No products found in the catalog directory.
+            </div>
+          `;
+        }
+      } catch (err) {
+        showToast('Failed to load products: ' + err.message, 'error');
+      }
+    }
+
+    // Initialize Hero Actions dynamically
+    function setupHeroActions() {
+      const container = document.getElementById('hero-actions');
+      if (Auth.isAuthenticated()) {
+        const user = Auth.getUser();
+        const role = Auth.getRole();
+        container.innerHTML = `
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <span class="text-sm font-semibold text-slate-700">Logged in as: <strong class="text-indigo-600">${user.name}</strong> (${role})</span>
+            <a href="${role === 'Admin' ? '/admin.html' : '/dashboard.html'}" class="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm">
+              Go to Your Dashboard →
+            </a>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <a href="/login.html" class="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition shadow-sm">
+            Sign In to System
+          </a>
+          <a href="/register.html" class="px-5 py-2.5 bg-slate-100 border border-slate-200 text-slate-700 font-medium rounded-lg hover:bg-slate-200 transition">
+            Create Free Account
+          </a>
+        `;
+      }
+    }
+
+    // Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderNavBar();
+      checkSystemStatus();
+      setupHeroActions();
+      loadCatalog();
+    });
+  </script>
+</body>
+</html>
